@@ -45,21 +45,24 @@ int Network::bindSocket(string port) {
   return 0;
 }
 
-int Network::receive() {
-  char buf[255];
-  memset(buf, 0, sizeof buf);
+char* Network::receive(size_t* length) {
+  char* buf = new char[BUF_SIZE]();
+  size_t len;
 
-  if(recvfrom(sock_desc, buf, 255, 0, nullptr, nullptr) == -1) {
+  // receive packet and save its size in LEN
+  len = recvfrom(sock_desc, buf, BUF_SIZE, 0, nullptr, nullptr);
+  if(len == -1) {
     cout << "ERROR: Could not receive packet!" << endl;
-    return -1;
+    return NULL;
   }
-  else
-    cout << "recv: " << buf << endl;
+  // if LENGTH was passed as argument, saves LEN in it
+  if(length != NULL)
+    *length = len;
 
-  return 0;
+  return buf;
 }
 
-int Network::sendTo(string ip, string port, string data) {
+int Network::sendTo(string ip, string port, const char* data, size_t size) {
   addrinfo hints;
   addrinfo* result;
   addrinfo* rp;
@@ -83,7 +86,7 @@ int Network::sendTo(string ip, string port, string data) {
     return -1;
   }
 
-  if(sendto(sock_desc, data.c_str(), data.length(), 0, rp->ai_addr, 
+  if(sendto(sock_desc, data, size, 0, rp->ai_addr, 
             rp->ai_addrlen) == -1)
     cout << "ERROR: Could not send packet!" << endl;
 
