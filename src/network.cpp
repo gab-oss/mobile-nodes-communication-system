@@ -45,12 +45,13 @@ int Network::bindSocket(string port) {
   return 0;
 }
 
-char* Network::receive(size_t* length) {
+char* Network::receive(sockaddr_storage* from, size_t* length) {
   char* buf = new char[BUF_SIZE]();
   size_t len;
+  socklen_t soc_len = sizeof(*from);
 
-  // receive packet and save its size in LEN
-  len = recvfrom(sock_desc, buf, BUF_SIZE, 0, nullptr, nullptr);
+  // receive packet, save its data in BUF and save datas size in LEN
+  len = recvfrom(sock_desc, buf, BUF_SIZE, 0, (sockaddr*)from, &soc_len);
   if(len == -1) {
     cout << "ERROR: Could not receive packet!" << endl;
     return NULL;
@@ -93,4 +94,16 @@ int Network::sendTo(string ip, string port, const char* data, size_t size) {
   freeaddrinfo(result);
 
   return 0;
+}
+
+char* Network::printableIpOfSender(sockaddr_storage &sender) {
+  if(sender.ss_family == AF_INET)
+    return inet_ntoa(((sockaddr_in*)&sender)->sin_addr);
+  else if(sender.ss_family == AF_INET6) {
+    char* printableIp = new char[INET6_ADDRSTRLEN]();
+    inet_ntop(AF_INET6, &((sockaddr_in6*)&sender)->sin6_addr, printableIp, sizeof(printableIp));
+    return printableIp;
+  }
+  
+  return NULL;
 }

@@ -16,7 +16,7 @@ enum IP_VERSION{IPV4, IPV6};
 
 class Network {
   int sock_desc;
-  IP_VERSION ip_version; 
+  IP_VERSION ip_version;
 
 public:
   Network(IP_VERSION ip_version_);
@@ -25,9 +25,11 @@ public:
   // binds socket to PORT so it can listen and receive packets from outside coming to this port
   int bindSocket(string port);
   // receives incoming packet and returns a pointer to data, saves its LENGTH if passed, need to call bindSocket() first
-  char* receive(size_t* length = NULL);
+  char* receive(sockaddr_storage* from, size_t* length = NULL);
   // send a packet with DATA of SIZE to given IP on given PORT
   int sendTo(string ip, string port, const char* data, size_t size);
+  // returns string with printable ip (either v4 or v6) of SENDER
+  char* printableIpOfSender(sockaddr_storage &sender);
 };
 
 #endif
