@@ -1,6 +1,8 @@
 #include "network.h"
 
 #include <cstring>
+#include <unistd.h>
+#include <fcntl.h>
 
 Network::Network(IP_VERSION ip_version_) : ip_version(ip_version_) {
   sock_desc = socket(ip_version == IPV4 ? AF_INET : AF_INET6, SOCK_DGRAM, 0);
@@ -42,6 +44,16 @@ int Network::bindSocket(string port) {
 
   freeaddrinfo(result);
 
+  // sets file descriptor flag for recvfrom() to be non-blocking
+  int flags = fcntl(sock_desc, F_GETFL);
+  // TODO: change '04000' to 'O_NONBLOCK' from <fcntl.h>
+  flags |= O_NONBLOCK;
+  fcntl(sock_desc, F_SETFL, flags);
+
+  // enable sending packets to broadcast addresses
+  const int opt = 1;
+  setsockopt(sock_desc, SOL_SOCKET, SO_BROADCAST, &opt, sizeof(opt));
+
   return 0;
 }
 
@@ -52,13 +64,19 @@ char* Network::receive(sockaddr_storage* from, size_t* length) {
 
   // receive packet, save its data in BUF and save datas size in LEN
   len = recvfrom(sock_desc, buf, BUF_SIZE, 0, (sockaddr*)from, &soc_len);
-  if(len == -1) {
-    cout << "ERROR: Could not receive packet!" << endl;
+  // if there was no packets received
+  if(len == 0 || len == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
     return NULL;
   }
-  // if LENGTH was passed as argument, saves LEN in it
-  if(length != NULL)
-    *length = len;
+  else {
+    if(len == -1) {
+      cout << "ERROR: Could not receive packet!" << endl;
+      return NULL;
+    }
+    // if LENGTH was passed as argument, saves LEN in it
+    if(length != NULL)
+      *length = len;
+  }
 
   return buf;
 }

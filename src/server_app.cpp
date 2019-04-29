@@ -2,20 +2,6 @@
 
 #include <cstring>
 
-void ipv6_to_str_unexpanded(char * str, const struct in6_addr * addr) {
-   sprintf(str, "%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x",
-                 (int)addr->s6_addr[0], (int)addr->s6_addr[1],
-                 (int)addr->s6_addr[2], (int)addr->s6_addr[3],
-                 (int)addr->s6_addr[4], (int)addr->s6_addr[5],
-                 (int)addr->s6_addr[6], (int)addr->s6_addr[7],
-                 (int)addr->s6_addr[8], (int)addr->s6_addr[9],
-                 (int)addr->s6_addr[10], (int)addr->s6_addr[11],
-                 (int)addr->s6_addr[12], (int)addr->s6_addr[13],
-                 (int)addr->s6_addr[14], (int)addr->s6_addr[15]);
-}
-
-IP_VERSION ip_version = IPV6;
-
 int main(int argc, char *argv[]) {
   if(argc != 3) {
     cout << "Usage: " << argv[0] << " (IPV4 | IPV6) port" << endl;
@@ -43,9 +29,8 @@ int main(int argc, char *argv[]) {
     sockaddr_storage sender;
     size_t length;
     char* data = network->receive(&sender, &length);
-
+    
     if(data != NULL) {
-      //ipv6_to_str_unexpanded(ip6, &((sockaddr_in6*)&from)->sin6_addr);
       char* sender_ip = network->printableIpOfSender(sender);
       cout << "Received " << length << " bytes: " << data << " from " << sender_ip << ":" << port << endl;
     }

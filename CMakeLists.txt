@@ -8,7 +8,7 @@ enable_testing()
 #include_directories(${PROJECT_NAME} PUBLIC include/models include/controllers include/views)
 
 #Find sources
-file(GLOB_RECURSE sources src/*.cpp)
+file(GLOB_RECURSE sources src/main.cpp src/mobile_node.cpp src/network.cpp)
 #file(GLOB_RECURSE sources_test tests/*.cpp)
 
 #Set targets
