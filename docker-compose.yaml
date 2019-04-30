@@ -4,8 +4,9 @@ services:
   build:
    context: .
    dockerfile: Dockerfile
-  container_name: node
-  ports: 
-   - 3000:3000
   environment:
    SERVER: 1
+ mobile:
+  build:
+   context: .
+   dockerfile: Dockerfile

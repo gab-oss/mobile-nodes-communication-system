@@ -4,8 +4,6 @@ COPY . /app
 
 WORKDIR /app
 
-RUN make
-
 EXPOSE 3000
 
-CMD ["/app/run.sh"]
+CMD ["./TIN", "IPV4", "255.255.255.255", "3000"]
