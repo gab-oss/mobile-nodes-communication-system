@@ -3,6 +3,13 @@
 
 #include "network.h"
 
+#include <boost/uuid/uuid.hpp>            
+#include <boost/uuid/uuid_generators.hpp> 
+#include <boost/uuid/uuid_io.hpp>    
+#include <boost/lexical_cast.hpp>  
+#include <string>
+
+
 class MobileNode {
   Network* network = NULL;
   unsigned char dataSequence = 0;
