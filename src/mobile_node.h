@@ -1,11 +1,17 @@
 #ifndef MOBILE_NODE_H_INCLUDED
 #define MOBILE_NODE_H_INCLUDED
 
+#include <iomanip>
+#include <ctime>
+#include <sstream>
+
 #include "network.h"
+#include "message.h"
 
 class MobileNode {
   Network* network = NULL;
-  unsigned char dataSequence = 0;
+  Message * message;
+  std::string dataSequence;
   IP_VERSION ip_version;
   char* ip;
   char* port;
@@ -16,6 +22,7 @@ public:
   void sendData();
   void receiveData();
   void mainLoop();
+  void getNewData();
 };
 
 #endif
