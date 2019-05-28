@@ -1,6 +1,7 @@
 #include "mobile_node.h"
 
-MobileNode::MobileNode(IP_VERSION ip_version_, char* ip_, char* port_) : ip_version(ip_version_), ip(ip_), port(port_) {
+MobileNode::MobileNode(IP_VERSION ip_version_, char* ip_, char* port_, bool is_serv)
+: ip_version(ip_version_), ip(ip_), port(port_), is_serv(is_serv) {
   network = new Network(ip_version);
   network->bindSocket(port);
   message = new Message();

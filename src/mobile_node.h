@@ -15,6 +15,7 @@
 #include "message.h"
 
 class MobileNode {
+  bool is_serv;
   Network* network = NULL;
   Message * message;
   std::string dataSequence;
@@ -25,7 +26,7 @@ class MobileNode {
 
 
 public:
-  MobileNode(IP_VERSION ip_version_, char* ip_, char* port_);
+  MobileNode(IP_VERSION ip_version_, char* ip_, char* port_, bool is_serv);
   ~MobileNode();
   void sendData();
   void receiveData();
