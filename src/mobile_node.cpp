@@ -12,7 +12,7 @@ MobileNode::~MobileNode() {
 }
 
 void  MobileNode::sendData() {
-  getNewData();
+
   char* data = new char[BUF_SIZE]();
   strcpy(data, dataSequence.c_str());
   // data[0] = dataSequence;
@@ -28,7 +28,6 @@ void MobileNode::receiveData() {
   char* m_text = new char[BUF_SIZE - UUID_SIZE];
   sockaddr_storage from;
 
-
   while((data = network->receive(&from)) != NULL) {
     char* sender_ip = network->printableIpOfSender(from);
 
@@ -40,6 +39,21 @@ void MobileNode::receiveData() {
 
     std::string s_uuid(uuid);
     std::string s_m_text(m_text);
+
+    //uuid saved - discard message
+    if (std::find(recent_uuids.begin(), recent_uuids.end(), s_uuid) != recent_uuids.end()) {
+
+      cout << "DISCARDED: UUID " << s_uuid
+            << " from " << sender_ip << " on port " << port << endl;
+
+      return;
+    }
+
+    recent_uuids.push_front(s_uuid);
+    if (recent_uuids.size() > MAX_RECENT_UUIDS) {
+      recent_uuids.pop_back();
+    }
+
     message->setUuid(s_uuid);
     message->setMessageText(s_m_text);
 
@@ -52,9 +66,35 @@ void MobileNode::receiveData() {
 }
 
 void MobileNode::mainLoop() {
+
+  getNewData();
+
+  unsigned int time_counter = 0;
+  // double time_counter = 0;
+  //
+  // clock_t this_time = clock();
+  // clock_t last_time = this_time;
+
   while(true) {
+
+    // get new data every RESEARCH_TIME seconds
+    // this_time = clock();
+    // time_counter += (double)(this_time - last_time);
+    // last_time = this_time;
+    //
+    // if(time_counter > (double)(RESEARCH_TIME * CLOCKS_PER_SEC)){
+    //    time_counter -= (double)(RESEARCH_TIME * CLOCKS_PER_SEC);
+    //    getNewData();
+    // }
+
+    if (time_counter > RESEARCH_TIME) {
+      getNewData();
+      time_counter = 0;
+    }
+
     receiveData();
     sendData();
+    ++time_counter;
     sleep(1);
   }
 }
@@ -75,5 +115,10 @@ void MobileNode::getNewData(){
   std::stringstream ss;
   ss << message->getUuid() << message->getMessageText();
   dataSequence = ss.str();
+
+  recent_uuids.push_front(message->getUuid());
+  if (recent_uuids.size() > MAX_RECENT_UUIDS) {
+    recent_uuids.pop_back();
+  }
 
 }

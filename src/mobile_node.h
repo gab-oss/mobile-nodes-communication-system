@@ -1,9 +1,15 @@
 #ifndef MOBILE_NODE_H_INCLUDED
 #define MOBILE_NODE_H_INCLUDED
 
+#define MAX_RECENT_UUIDS 5
+#define RESEARCH_TIME 4
+
 #include <iomanip>
 #include <ctime>
 #include <sstream>
+#include <algorithm>
+#include <list>
+#include <time.h>
 
 #include "network.h"
 #include "message.h"
@@ -15,6 +21,8 @@ class MobileNode {
   IP_VERSION ip_version;
   char* ip;
   char* port;
+  std::list<std::string> recent_uuids;
+
 
 public:
   MobileNode(IP_VERSION ip_version_, char* ip_, char* port_);
