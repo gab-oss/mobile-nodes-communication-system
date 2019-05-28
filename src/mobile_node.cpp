@@ -58,11 +58,13 @@ void MobileNode::receiveData() {
     message->setUuid(s_uuid);
     message->setMessageText(s_m_text);
 
-    cout << "RECV: " << m_text << " UUID " << uuid
-          << " from " << sender_ip << " on port " << port << endl;
+    if (is_serv) {
+      cout << "RECV: " << m_text << " UUID " << uuid
+            << " from " << sender_ip << " on port " << port << endl;
 
-          cout << "MESSAGE IS: " << message->getMessageText() << " UUID " << message->getUuid()
-                << " from " << sender_ip << " on port " << port << endl;
+            cout << "MESSAGE IS: " << message->getMessageText() << " UUID " << message->getUuid()
+                  << " from " << sender_ip << " on port " << port << endl;
+    }
   }
 }
 
