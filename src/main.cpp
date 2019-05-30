@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[]) {
   if(argc != 5) {
-    cout << "Usage: " << argv[0] << " (IPV4 | IPV6) address port" << endl;
+    cout << "Usage: " << argv[0] << " (IPV4 | IPV6) address port is_server(1 | 0)" << endl;
     return 0;
   }
 
@@ -19,7 +19,13 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  MobileNode* node = new MobileNode(ip_version, argv[2], argv[3], argv[4]);
+  bool is_server;
+  if(strcmp(argv[4], "1") == 0)
+    is_server = true;
+  else
+    is_server = false;
+
+  MobileNode* node = new MobileNode(ip_version, argv[2], argv[3], is_server);
 
   node->mainLoop();
 

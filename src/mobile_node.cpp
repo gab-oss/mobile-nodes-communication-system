@@ -18,7 +18,7 @@ void  MobileNode::sendData() {
   strcpy(data, dataSequence.c_str());
   // data[0] = dataSequence;
   if(network->sendTo(ip, port, data, BUF_SIZE) == 0)
-    cout << "SEND: Seq" << message->getMessageText() << ", UUID " << message->getUuid()
+    cout << "SEND: " << message->getMessageText() << ", UUID " << message->getUuid()
      << " to " << ip << ":" << port << endl;
   // dataSequence++;
 }
