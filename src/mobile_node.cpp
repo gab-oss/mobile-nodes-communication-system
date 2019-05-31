@@ -42,63 +42,60 @@ void MobileNode::receiveData() {
     std::string s_m_text(m_text);
 
     //uuid saved - discard message
-    if (std::find(recent_uuids.begin(), recent_uuids.end(), s_uuid) != recent_uuids.end()) {
+    if (!is_serv) {
+      if (std::find(recent_uuids.begin(), recent_uuids.end(), s_uuid) != recent_uuids.end()) {
 
-      cout << "DISCARDED: UUID " << s_uuid
-            << " from " << sender_ip << " on port " << port << endl;
+        cout << "DISCARDED: UUID " << s_uuid
+              << " from " << sender_ip << " on port " << port << endl;
 
-      return;
-    }
+        return;
+      }
 
-    recent_uuids.push_front(s_uuid);
-    if (recent_uuids.size() > MAX_RECENT_UUIDS) {
-      recent_uuids.pop_back();
+      recent_uuids.push_front(s_uuid);
+      if (recent_uuids.size() > MAX_RECENT_UUIDS) {
+        recent_uuids.pop_back();
+      }
     }
 
     message->setUuid(s_uuid);
     message->setMessageText(s_m_text);
 
-    if (is_serv) {
-      cout << "RECV: " << m_text << " UUID " << uuid
-            << " from " << sender_ip << " on port " << port << endl;
+    // if (is_serv) {
+    cout << "RECV: " << "message with uuid " << message->getUuid()
+          << " from " << sender_ip << " on port " << port << endl;
 
-            cout << "MESSAGE IS: " << message->getMessageText() << " UUID " << message->getUuid()
-                  << " from " << sender_ip << " on port " << port << endl;
+    if (is_serv) {
+      cout << "MESSAGE IS: " << message->getMessageText() << endl;;
     }
+
+    // }
   }
 }
 
 void MobileNode::mainLoop() {
 
-  getNewData();
+  if (is_serv) {
 
-  unsigned int time_counter = 0;
-  // double time_counter = 0;
-  //
-  // clock_t this_time = clock();
-  // clock_t last_time = this_time;
-
-  while(true) {
-
-    // get new data every RESEARCH_TIME seconds
-    // this_time = clock();
-    // time_counter += (double)(this_time - last_time);
-    // last_time = this_time;
-    //
-    // if(time_counter > (double)(RESEARCH_TIME * CLOCKS_PER_SEC)){
-    //    time_counter -= (double)(RESEARCH_TIME * CLOCKS_PER_SEC);
-    //    getNewData();
-    // }
-
-    if (time_counter > RESEARCH_TIME) {
-      getNewData();
-      time_counter = 0;
+    while(true) {
+      receiveData();
+      sleep(1);
     }
+  } else {
 
-    receiveData();
-    sendData();
-    ++time_counter;
-    sleep(1);
+    getNewData();
+    unsigned int time_counter = 0;
+    while(true) {
+
+      if (time_counter > RESEARCH_TIME) {
+        getNewData();
+        time_counter = 0;
+      }
+
+      receiveData();
+      sendData();
+      ++time_counter;
+      sleep(1);
+    }
   }
 }
 
