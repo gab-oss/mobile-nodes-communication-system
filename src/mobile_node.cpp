@@ -42,19 +42,22 @@ void MobileNode::receiveData() {
     std::string s_m_text(m_text);
 
     //uuid saved - discard message
-    if (!is_serv) {
-      if (std::find(recent_uuids.begin(), recent_uuids.end(), s_uuid) != recent_uuids.end()) {
 
+    if (std::find(recent_uuids.begin(), recent_uuids.end(), s_uuid) != recent_uuids.end())
+    {
+      if (!is_serv)
+      {
         cout << "DISCARDED: UUID " << s_uuid
-              << " from " << sender_ip << " on port " << port << endl;
-
-        return;
+             << " from " << sender_ip << " on port " << port << endl;
       }
+      return;
+      
+    }
 
-      recent_uuids.push_front(s_uuid);
-      if (recent_uuids.size() > MAX_RECENT_UUIDS) {
-        recent_uuids.pop_back();
-      }
+    recent_uuids.push_front(s_uuid);
+    if (recent_uuids.size() > MAX_RECENT_UUIDS)
+    {
+      recent_uuids.pop_back();
     }
 
     message->setUuid(s_uuid);
