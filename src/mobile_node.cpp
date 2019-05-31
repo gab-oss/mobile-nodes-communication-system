@@ -102,15 +102,24 @@ void MobileNode::mainLoop() {
 void MobileNode::getNewData(){
 
   //current time
+  srand(time(0)); 
   auto t = std::time(nullptr);
   auto tm = *std::localtime(&t);
 
-  std::ostringstream oss;
-  oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
-  auto _time = oss.str();
+  // std::ostringstream oss;
+  // oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
+  // auto _time = oss.str();
+
+  int value = (rand() % 1000) + 1;
+  std:string delimiter = "::";
+  
+  std::stringstream message_ss;
+  message_ss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S") << delimiter << value;
+
+  std::string s_message = message_ss.str();
 
   message->generateUuid();
-  message->setMessageText(_time);
+  message->setMessageText(s_message);
 
   std::stringstream ss;
   ss << message->getUuid() << message->getMessageText();

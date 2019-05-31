@@ -10,6 +10,8 @@
 #include <algorithm>
 #include <list>
 #include <time.h>
+#include <ctime>    
+#include <cstdlib>  
 
 #include "network.h"
 #include "message.h"

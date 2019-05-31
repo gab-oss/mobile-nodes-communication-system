@@ -161,6 +161,33 @@ src/main.cpp.s:
 	$(MAKE) -f CMakeFiles/TIN.dir/build.make CMakeFiles/TIN.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/message.o: src/message.cpp.o
+
+.PHONY : src/message.o
+
+# target to build an object file
+src/message.cpp.o:
+	$(MAKE) -f CMakeFiles/TIN.dir/build.make CMakeFiles/TIN.dir/src/message.cpp.o
+.PHONY : src/message.cpp.o
+
+src/message.i: src/message.cpp.i
+
+.PHONY : src/message.i
+
+# target to preprocess a source file
+src/message.cpp.i:
+	$(MAKE) -f CMakeFiles/TIN.dir/build.make CMakeFiles/TIN.dir/src/message.cpp.i
+.PHONY : src/message.cpp.i
+
+src/message.s: src/message.cpp.s
+
+.PHONY : src/message.s
+
+# target to generate assembly for a file
+src/message.cpp.s:
+	$(MAKE) -f CMakeFiles/TIN.dir/build.make CMakeFiles/TIN.dir/src/message.cpp.s
+.PHONY : src/message.cpp.s
+
 src/mobile_node.o: src/mobile_node.cpp.o
 
 .PHONY : src/mobile_node.o
@@ -228,6 +255,9 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/message.o"
+	@echo "... src/message.i"
+	@echo "... src/message.s"
 	@echo "... src/mobile_node.o"
 	@echo "... src/mobile_node.i"
 	@echo "... src/mobile_node.s"
