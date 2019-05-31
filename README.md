@@ -1,5 +1,9 @@
 # mobile-nodes-communication-system
 
+install.sh - skrypt instalacyjny
+build.sh - skrypt budujacy projekt
+net-swapper.py - skrypt przelaczajacy wezly pomiedzy sieciami
+
 Trzeba sobie zbudowac projekt i zainstalowac Docker i Docker Compose.
 
 Budowanie obrazow: sudo docker-compose build

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>160</x>
+      <y>20</y>
+      <w>420</w>
+      <h>170</h>
+    </coordinates>
+    <panel_attributes>Network
+--
+- sock_desc : int
+- ip_version : IP_VERSION
+--
++ Network(IP_VERSION ip_version_) : void
++ ~Network() : void
++ bindSocket(string port) : int
++ receive(sockaddr_storage* from, size_t* length) : char*
++ sendTo(string ip, string port, const char* data, size_t size) : int
++ printableIpOfSender(sockaddr_storage &amp;sender) : char*
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>100</x>
+      <y>250</y>
+      <w>530</w>
+      <h>270</h>
+    </coordinates>
+    <panel_attributes>MobileNode
+--
+- is_serv : bool
+- network : Network*
+- message : Message*
+- dataSequence : string
+- ip_version : IP_VERSION
+- ip : char*
+- port : char*
+- recent_uuids : list&lt;string&gt;
+--
++ MobileNode(IP_VERSION ip_version_, char* ip_, char* port_, bool is_serv) : void
++ ~MobileNode() : void
++ sendData() : void
++ receiveData() : void
++ mainLoop() : void
++ getNewData() : void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>240</x>
+      <y>580</y>
+      <w>260</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>Message
+--
+- uuid : string 
+- mtext : string
+--
++ Message() : void
++ Message(string _mtext) : void
++ generateUuid() : string
++ getMessageText() : string
++ getUuid() : string
++ setUuid(string _uuid) : void
++ setMessageText(string _mtext) : void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>360</x>
+      <y>180</y>
+      <w>30</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>360</x>
+      <y>510</y>
+      <w>30</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+</diagram>

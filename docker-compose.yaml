@@ -4,9 +4,9 @@ services:
   build:
    context: .
    dockerfile: Dockerfile
-  environment:
-   SERVER: 1
+  command: ["./TIN", "IPV4", "255.255.255.255", "3000", "1"]
  mobile:
   build:
    context: .
    dockerfile: Dockerfile
+  command: ["./TIN", "IPV4", "255.255.255.255", "3000", "0"]

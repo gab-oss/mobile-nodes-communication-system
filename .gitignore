@@ -3,3 +3,8 @@ CMakeFiles/
 CMakeCache.txt
 CTestTestfile.cmake
 cmake_install.cmake
+bin/
+obj/
+build/
+TIN
+

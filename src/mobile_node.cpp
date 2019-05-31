@@ -1,72 +1,124 @@
 #include "mobile_node.h"
 
-  MobileNode::MobileNode(IP_VERSION ip_version_, char* ip_, char* port_) : ip_version(ip_version_), ip(ip_), port(port_) {
-    network = new Network(ip_version);
-    network->bindSocket(port);
-  }
+MobileNode::MobileNode(IP_VERSION ip_version_, char* ip_, char* port_, bool is_serv)
+: ip_version(ip_version_), ip(ip_), port(port_), is_serv(is_serv) {
+  network = new Network(ip_version);
+  network->bindSocket(port);
+  message = new Message();
+}
 
-  MobileNode::~MobileNode() {
-    delete network;
-  }
+MobileNode::~MobileNode() {
+  delete network;
+  delete message;
+}
 
-  void  MobileNode::sendData() {
-    char* data = new char[BUF_SIZE]();
-    boost::uuids::uuid uuid = boost::uuids::random_generator()();
+void  MobileNode::sendData() {
 
-    const string s_uuid = boost::lexical_cast<string>(uuid);
-    const char * c_uuid = s_uuid.c_str();
-    size_t seq_size = sizeof(dataSequence);
-    size_t uuid_size = sizeof(c_uuid);
+  char* data = new char[BUF_SIZE]();
+  strcpy(data, dataSequence.c_str());
+  // data[0] = dataSequence;
+  if(network->sendTo(ip, port, data, BUF_SIZE) == 0)
+    cout << "SEND: " << message->getMessageText() << ", UUID " << message->getUuid()
+     << " to " << ip << ":" << port << endl;
+  // dataSequence++;
+}
 
-    memcpy(data, &seq_size, sizeof(size_t));
-    memcpy(data + sizeof(size_t), &uuid_size, sizeof(size_t));
-    memcpy(data + 2 * sizeof(size_t), &dataSequence, seq_size);
-    memcpy(data + 2 * sizeof(size_t) + seq_size, c_uuid, uuid_size);
+void MobileNode::receiveData() {
+  char* data = new char[BUF_SIZE];
+  char* uuid = new char[UUID_SIZE];
+  char* m_text = new char[BUF_SIZE - UUID_SIZE];
+  sockaddr_storage from;
 
-    for(int i = 0 ; i < 2 *sizeof(size_t) + seq_size + uuid_size; ++i)
-    {
-      cout << data[i];
+  while((data = network->receive(&from)) != NULL) {
+    char* sender_ip = network->printableIpOfSender(from);
+
+    for (int i = 0; i < UUID_SIZE; ++ i) {
+      uuid[i] = data[i];
     }
-    cout << endl;
-    
-    if(network->sendTo(ip, port, data, BUF_SIZE) == 0)
-      cout << "SEND: Seq" << (int)dataSequence << " uuid: " << s_uuid << " to " << ip << ":" << port << endl;
-    dataSequence++;
-  }
 
-  void MobileNode::receiveData() {
-    char* data = new char[BUF_SIZE]();
+    strcpy (m_text, data + UUID_SIZE);
 
-    size_t seq_size;
-    size_t uuid_size;
+    std::string s_uuid(uuid);
+    std::string s_m_text(m_text);
 
-    sockaddr_storage from;
+    //uuid saved - discard message
+    if (!is_serv) {
+      if (std::find(recent_uuids.begin(), recent_uuids.end(), s_uuid) != recent_uuids.end()) {
 
-    while((data = network->receive(&from)) != NULL) {
-      char* sender_ip = network->printableIpOfSender(from);
+        cout << "DISCARDED: UUID " << s_uuid
+              << " from " << sender_ip << " on port " << port << endl;
 
-      memcpy(&seq_size, (char*)data, sizeof(size_t));
-      memcpy(&uuid_size, (char*)data + sizeof(size_t), sizeof(size_t));
+        return;
+      }
 
-      char* seqbuf = new char[seq_size]();
-      char* uuidbuf = new char[uuid_size]();
-
-      memcpy(seqbuf, (char*)data + 2 * sizeof(size_t), seq_size);
-      memcpy(uuidbuf, (char*)data + 2 * sizeof(size_t) + seq_size, uuid_size);
-
-      string s_uuid(uuidbuf);
-      string seq(seqbuf);
-
-      cout << "RECV: Seq" << seq
-      << ", UUID " << s_uuid
-      << " from " << sender_ip << " on port " << port << endl;
+      recent_uuids.push_front(s_uuid);
+      if (recent_uuids.size() > MAX_RECENT_UUIDS) {
+        recent_uuids.pop_back();
+      }
     }
-  }
 
-  void MobileNode::mainLoop() {
+    message->setUuid(s_uuid);
+    message->setMessageText(s_m_text);
+
+    // if (is_serv) {
+    cout << "RECV: " << "message with uuid " << message->getUuid()
+          << " from " << sender_ip << " on port " << port << endl;
+
+    if (is_serv) {
+      cout << "MESSAGE IS: " << message->getMessageText() << endl;;
+    }
+
+    // }
+  }
+}
+
+void MobileNode::mainLoop() {
+
+  if (is_serv) {
+
     while(true) {
       receiveData();
+      sleep(1);
+    }
+  } else {
+
+    getNewData();
+    unsigned int time_counter = 0;
+    while(true) {
+
+      if (time_counter > RESEARCH_TIME) {
+        getNewData();
+        time_counter = 0;
+      }
+
+      receiveData();
       sendData();
+      ++time_counter;
       sleep(1);
     }
   }
+}
+
+void MobileNode::getNewData(){
+
+  //current time
+  auto t = std::time(nullptr);
+  auto tm = *std::localtime(&t);
+
+  std::ostringstream oss;
+  oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
+  auto _time = oss.str();
+
+  message->generateUuid();
+  message->setMessageText(_time);
+
+  std::stringstream ss;
+  ss << message->getUuid() << message->getMessageText();
+  dataSequence = ss.str();
+
+  recent_uuids.push_front(message->getUuid());
+  if (recent_uuids.size() > MAX_RECENT_UUIDS) {
+    recent_uuids.pop_back();
+  }
+
+}
